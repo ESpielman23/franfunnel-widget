@@ -6,65 +6,34 @@
     <script src="ZohoEmbededAppSDK.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; height: 100vh; display: flex; flex-direction: column; }
-        #error { display: none; padding: 20px; color: #c0392b; font-size: 14px; }
-        #loading { padding: 20px; color: #555; font-size: 14px; }
-        iframe {
-            flex: 1;
-            width: 100%;
-            border: none;
-            display: none;
-        }
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        #debug { font-size: 12px; word-break: break-all; white-space: pre-wrap; }
     </style>
 </head>
 <body>
-    <div id="loading">Loading FranFunnel...</div>
-    <div id="error"></div>
-    <iframe id="franfunnel-frame" allowfullscreen></iframe>
+    <div id="debug">Waiting for PageLoad...</div>
 
     <script>
         ZOHO.embeddedApp.on("PageLoad", function(data) {
+            document.getElementById("debug").textContent = "PageLoad data:\n" + JSON.stringify(data, null, 2);
+
             if (!data || !data.EntityId || !data.EntityId[0]) {
-                showError("No record ID found. PageLoad data: " + JSON.stringify(data));
+                document.getElementById("debug").textContent += "\n\nNo EntityId found!";
                 return;
             }
 
             var recordId = data.EntityId[0];
-            document.getElementById("loading").textContent = "Loading FranFunnel... (Record ID: " + recordId + ")";
+            document.getElementById("debug").textContent += "\n\nAttempting getRecord with ID: " + recordId;
 
             ZOHO.CRM.API.getRecord({
-                Entity: "Contacts",
+                Entity: data.Entity || "Contacts",
                 RecordID: recordId
             }).then(function(response) {
-                var record = response && response.data && response.data[0];
-                if (!record) {
-                    showError("Could not load contact record. Full response: " + JSON.stringify(response));
-                    return;
-                }
-
-                var franFunnelId = record["FranFunnel_ID"];
-                if (!franFunnelId) {
-                    showError("No FranFunnel ID found. Record fields: " + JSON.stringify(Object.keys(record)));
-                    return;
-                }
-
-                var url = "https://app.franfunnel.com/app/lead/" + franFunnelId;
-                var frame = document.getElementById("franfunnel-frame");
-                frame.src = url;
-                frame.style.display = "block";
-                document.getElementById("loading").style.display = "none";
-
+                document.getElementById("debug").textContent += "\n\nAPI Response:\n" + JSON.stringify(response, null, 2);
             }).catch(function(error) {
-                showError("Error fetching record: " + JSON.stringify(error));
+                document.getElementById("debug").textContent += "\n\nAPI Error:\n" + JSON.stringify(error, null, 2);
             });
         });
-
-        function showError(msg) {
-            document.getElementById("loading").style.display = "none";
-            var err = document.getElementById("error");
-            err.style.display = "block";
-            err.textContent = msg;
-        }
 
         ZOHO.embeddedApp.init();
     </script>
