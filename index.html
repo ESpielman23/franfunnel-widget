@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>FranFunnel Widget</title>
+    <script src="ZohoEmbeddedAppSDK.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; height: 100vh; display: flex; flex-direction: column; }
+        #error { display: none; padding: 20px; color: #c0392b; font-size: 14px; }
+        #loading { padding: 20px; color: #555; font-size: 14px; }
+        iframe {
+            flex: 1;
+            width: 100%;
+            border: none;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading">Loading FranFunnel...</div>
+    <div id="error"></div>
+    <iframe id="franfunnel-frame" allowfullscreen></iframe>
+
+    <script>
+        ZOHO.embeddedApp.on("PageLoad", function(data) {
+            if (!data || !data.EntityId || !data.EntityId[0]) {
+                showError("No record ID found in page data.");
+                return;
+            }
+
+            var recordId = data.EntityId[0];
+
+            ZOHO.CRM.API.getRecord({
+                Entity: "Contacts",
+                RecordID: recordId
+            }).then(function(response) {
+                var record = response && response.data && response.data[0];
+                if (!record) {
+                    showError("Could not load contact record.");
+                    return;
+                }
+
+                var franFunnelId = record["FranFunnel_ID"];
+                if (!franFunnelId) {
+                    showError("No FranFunnel ID found on this contact record. Please ensure the FranFunnel_ID field is populated.");
+                    return;
+                }
+
+                var url = "https://app.franfunnel.com/app/lead/" + franFunnelId;
+                var frame = document.getElementById("franfunnel-frame");
+                frame.src = url;
+                frame.style.display = "block";
+                document.getElementById("loading").style.display = "none";
+
+            }).catch(function(error) {
+                showError("Error fetching record: " + JSON.stringify(error));
+            });
+        });
+
+        function showError(msg) {
+            document.getElementById("loading").style.display = "none";
+            var err = document.getElementById("error");
+            err.style.display = "block";
+            err.textContent = msg;
+        }
+
+        ZOHO.embeddedApp.init();
+    </script>
+</body>
+</html>
