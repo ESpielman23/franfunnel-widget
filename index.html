@@ -25,11 +25,12 @@
     <script>
         ZOHO.embeddedApp.on("PageLoad", function(data) {
             if (!data || !data.EntityId || !data.EntityId[0]) {
-                showError("No record ID found in page data.");
+                showError("No record ID found. PageLoad data: " + JSON.stringify(data));
                 return;
             }
 
             var recordId = data.EntityId[0];
+            document.getElementById("loading").textContent = "Loading FranFunnel... (Record ID: " + recordId + ")";
 
             ZOHO.CRM.API.getRecord({
                 Entity: "Contacts",
@@ -37,13 +38,13 @@
             }).then(function(response) {
                 var record = response && response.data && response.data[0];
                 if (!record) {
-                    showError("Could not load contact record.");
+                    showError("Could not load contact record. Full response: " + JSON.stringify(response));
                     return;
                 }
 
                 var franFunnelId = record["FranFunnel_ID"];
                 if (!franFunnelId) {
-                    showError("No FranFunnel ID found on this contact record. Please ensure the FranFunnel_ID field is populated.");
+                    showError("No FranFunnel ID found. Record fields: " + JSON.stringify(Object.keys(record)));
                     return;
                 }
 
