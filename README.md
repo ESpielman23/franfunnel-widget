@@ -1,12 +1,12 @@
 # FranFunnel Zoho CRM Widget
 
-This repository hosts the files for the FranFunnel Conversation widget embedded inside Zoho CRM. The widget loads the FranFunnel conversation view for a contact directly inside the Zoho CRM contact record.
+This repository hosts the files for the FranFunnel Conversation widget embedded inside Zoho CRM. The widget loads the FranFunnel conversation view for a CRM record (Deals or Leads) directly inside Zoho CRM.
 
 ## How It Works
 
-1. When a Zoho CRM user opens a Contact record, the widget initializes via the Zoho Embedded App SDK
-2. The widget reads the contact's `FranFunnel_ID` field from the Zoho CRM record
-3. It constructs the URL `https://app.franfunnel.com/app/lead/{FranFunnel_ID}` and loads it in an iframe
+1. When a Zoho CRM user opens a record in any supported module (e.g., Deals, Leads, Contacts), the widget initializes via the Zoho Embedded App SDK.
+2. The widget reads the record's `FranFunnel_ID` field directly from the current Zoho CRM record.
+3. It constructs the URL `https://app.franfunnel.com/app/lead/{FranFunnel_ID}` and loads it in an iframe.
 
 ## Current Status
 
@@ -67,5 +67,5 @@ Without this, the browser will silently drop the auth cookie when FranFunnel is 
 | Type | Related List |
 | Hosting | External |
 | Base URL | https://espielman23.github.io/franfunnel-widget/ |
-| Entity | Contacts |
+| Entity | Deals, Leads |
 | FranFunnel ID Field | `FranFunnel_ID` |
