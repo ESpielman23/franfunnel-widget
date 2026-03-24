@@ -32,7 +32,7 @@
             var recordId = Array.isArray(data.EntityId) ? data.EntityId[0] : data.EntityId;
 
             ZOHO.CRM.API.getRecord({
-                Entity: "Deals",
+                Entity: "Leads",
                 RecordID: recordId
             }).then(function(response) {
                 var record = response && response.data && response.data[0];
